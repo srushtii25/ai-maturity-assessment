@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Maturity Assessment{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="font-inter bg-gray-50 text-gray-800">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="{% url 'home' %}" class="flex items-center">
+                            <svg class="h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                            </svg>
+                            <span class="ml-2 text-xl font-semibold text-gray-800">AI Maturity</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <!-- <a href="{% url 'home' %}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600">Home</a> -->
+                    {% if request.session.user_id %}
+                        <a href="{% url 'dashboard' %}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600">Dashboard</a>
+                        <a href="{% url 'logout' %}" class="ml-4 px-4 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-md hover:bg-red-50">Logout</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600">Login</a>
+                        <a href="{% url 'signup' %}" class="ml-4 px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50">Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    {% block content %}{% endblock %}
+    
+    <!-- Footer -->
+    <footer class="py-6 px-6 sm:px-8 border-t border-gray-200 bg-white mt-auto">
+        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center">
+            <div class="mb-4 sm:mb-0 flex items-center">
+                <svg class="h-5 w-5 text-blue-600 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+                <span class="text-sm text-gray-500">© {% now "Y" %} AI Maturity Assessment. All rights reserved.</span>
+            </div>
+            <div class="flex items-center space-x-6">
+                <a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Privacy Policy</a>
+                <a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Terms of Service</a>
+                <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Contact Support</a>
+            </div>
+        </div>
+    </footer>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,1 @@
+web: gunicorn ai_maturity_app.wsgi --log-file -

@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .section-tracker {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .section-tracker::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: #e2e8f0;
+        transform: translateY(-50%);
+        z-index: 0;
+    }
+    
+    .section-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #e2e8f0;
+        border: 2px solid #fff;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .section-dot.active {
+        background-color: #3b82f6;
+        transform: scale(1.2);
+    }
+    
+    .section-dot.completed {
+        background-color: #93c5fd;
+    }
+    
+    .option-card {
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+        cursor: pointer;
+    }
+    
+    .option-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .option-card.selected {
+        border-color: #3b82f6;
+        background-color: #eff6ff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col">
+    <!-- Header with Progress -->
+    <header class="bg-white py-6 px-6 sm:px-10 shadow-sm border-b">
+        <div class="max-w-4xl mx-auto w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-xl font-semibold text-gray-800">AI Maturity Assessment</h1>
+                <div class="flex items-center">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-gray-600">Autosaving</span>
+                </div>
+            </div>
+            
+            <!-- Section Progress Dots -->
+            <div class="section-tracker mb-6">
+                {% for i in "123456789" %}
+                <div class="section-dot {% if forloop.counter0 == category_index %}active{% elif forloop.counter0 < category_index %}completed{% endif %}"></div>
+                {% endfor %}
+            </div>
+            
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-lg font-medium text-gray-800">Section {{ category_index|add:1 }} of {{ total_categories }}: {{ category }}</h2>
+                <span class="text-sm font-medium text-gray-600">Question {{ question_index|add:1 }} of {{ total_questions }}</span>
+            </div>
+            
+            <!-- Question Progress Bar -->
+            <div class="h-1 bg-gray-200 rounded-full overflow-hidden mb-6">
+                <div class="h-full bg-blue-600 rounded-full" style="width: {{ progress }}%"></div>
+            </div>
+            
+            <p class="text-sm text-gray-500 mb-6">Each section contains 5 quick questions. Your responses help us understand your organization's AI readiness.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow py-8 px-6 sm:px-10">
+        <div class="max-w-4xl mx-auto">
+            <!-- Question Card -->
+            <div class="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
+                <!-- Question -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">{{ question }}</h3>
+                    <p class="text-gray-500">Select the option that best describes your organization's current state.</p>
+                </div>
+                
+                <!-- Options -->
+                <div class="space-y-4" id="options-container">
+                    {% for key, option in options.items %}
+                    <label class="option-card bg-white rounded-lg border border-gray-200 p-5 flex items-start cursor-pointer" 
+                           data-score="{{ option.score }}" data-text="{{ option.text }}" data-key="{{ key }}">
+                        <input type="radio" name="answer" value="{{ key }}" class="mt-1 mr-4 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" 
+                               data-score="{{ option.score }}" data-text="{{ option.text }}">
+                        <span class="text-base font-medium flex-1">{{ option.text }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between items-center mt-8">
+                <button id="previous-button" class="flex items-center text-blue-600 font-medium hover:text-blue-800 transition duration-200 {% if category_index == 0 and question_index == 0 %}opacity-50 cursor-not-allowed{% endif %}" {% if category_index == 0 and question_index == 0 %}disabled{% endif %}>
+                    <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Previous Question
+                </button>
+                <button id="next-button" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium flex items-center shadow-sm hover:bg-blue-700 transition duration-200 opacity-50 cursor-not-allowed" disabled>
+                    Next Question
+                    <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+const radioButtons = document.querySelectorAll('input[name="answer"]');
+const optionCards = document.querySelectorAll('.option-card');
+const nextButton = document.getElementById('next-button');
+const previousButton = document.getElementById('previous-button');
+let selectedAnswer = null;
+
+// Load previously saved answer
+{% if current_answer %}
+console.log('DEBUG: Current answer data:', {
+    text: "{{ current_answer.text|escapejs }}",
+    score: {{ current_answer.score }},
+    key: "{{ current_answer.key|default:'' }}"
+});
+
+// Set the selected answer
+selectedAnswer = {
+    text: "{{ current_answer.text|escapejs }}",
+    score: {{ current_answer.score }}
+};
+
+// Find and select the matching radio button by option key
+{% if current_answer.key %}
+const targetKey = "{{ current_answer.key }}";
+console.log('DEBUG: Looking for key:', targetKey);
+radioButtons.forEach((radio, index) => {
+    console.log(`DEBUG: Radio ${index} - value: ${radio.value}, key: ${targetKey}`);
+    if (radio.value === targetKey) {
+        console.log('DEBUG: Match found! Selecting radio button');
+        radio.checked = true;
+        radio.closest('.option-card').classList.add('selected');
+        nextButton.disabled = false;
+        nextButton.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+});
+{% else %}
+console.log('DEBUG: No key found in current_answer');
+{% endif %}
+{% else %}
+console.log('DEBUG: No current_answer found');
+{% endif %}
+
+radioButtons.forEach(radio => {
+    radio.addEventListener('change', () => {
+        if (radio.checked) {
+            console.log('Radio button changed:', radio.dataset.score, radio.dataset.text);
+            
+            // Remove selected class from all cards
+            optionCards.forEach(card => card.classList.remove('selected'));
+            
+            // Add selected class to current card
+            radio.closest('.option-card').classList.add('selected');
+            
+            // Store selected answer
+            selectedAnswer = {
+                text: radio.dataset.text,
+                score: parseInt(radio.dataset.score)
+            };
+            
+            // Enable next button
+            nextButton.disabled = false;
+            nextButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            
+            // Auto-save answer
+            saveAnswer();
+        }
+    });
+});
+
+nextButton.addEventListener('click', () => {
+    if (selectedAnswer) {
+        console.log('Next button clicked, saving and navigating');
+        saveAnswer().then(() => {
+            window.location.href = "{% url 'next_question' %}";
+        });
+    }
+});
+
+previousButton.addEventListener('click', () => {
+    if (!previousButton.disabled) {
+        console.log('Previous button clicked');
+        window.location.href = "{% url 'previous_question' %}";
+    }
+});
+
+// Debug: Log all radio buttons on page load
+console.log('Page loaded. Radio buttons:');
+radioButtons.forEach((radio, index) => {
+    console.log(`Radio ${index}: score=${radio.dataset.score}, text=${radio.dataset.text.substring(0, 50)}...`);
+});
+console.log('Option cards:', optionCards.length);
+console.log('Next button:', nextButton);
+console.log('Previous button:', previousButton);
+
+function saveAnswer() {
+    if (!selectedAnswer) return Promise.resolve();
+    
+    console.log('Saving answer:', selectedAnswer);
+    
+    return fetch("{% url 'save_answer' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            session_id: "{{ session_id }}",
+            category: "{{ category }}",
+            question_id: "{{ question_id }}",
+            answer: selectedAnswer.text,
+            score: selectedAnswer.score
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Save response:', data);
+        if (data.status !== 'success') {
+            console.error('Save failed:', data.message);
+        }
+        return data;
+    })
+    .catch(error => {
+        console.error('Save error:', error);
+        return {status: 'error'};
+    });
+}
+
+// Auto-save on page unload
+window.addEventListener('beforeunload', () => {
+    if (selectedAnswer) {
+        navigator.sendBeacon("{% url 'save_answer' %}", JSON.stringify({
+            session_id: "{{ session_id }}",
+            category: "{{ category }}",
+            question_id: "{{ question_id }}",
+            answer: selectedAnswer.text,
+            score: selectedAnswer.score
+        }));
+    }
+});
+</script>
+{% endblock %}

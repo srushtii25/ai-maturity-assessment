@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .roadmap {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin: 20px 0 60px;
+    }
+    
+    .roadmap::before {
+        content: '';
+        position: absolute;
+        top: 80px;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #0ea5e9, #06b6d4);
+        z-index: 0;
+    }
+    
+    .step {
+        position: relative;
+        width: 23%;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .step-connector {
+        position: absolute;
+        top: 80px;
+        right: -12.5%;
+        width: 25%;
+        height: 4px;
+        z-index: 0;
+    }
+    
+    .step-connector svg {
+        position: absolute;
+        right: -20px;
+        top: -8px;
+        width: 20px;
+        height: 20px;
+        color: #06b6d4;
+    }
+    
+    .step-number {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #0ea5e9;
+        color: white;
+        font-weight: 600;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+    
+    .step-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: #f0f9ff;
+        border: 4px solid #0ea5e9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+        font-size: 32px;
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+    }
+    
+    .step-card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        padding: 24px;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+        height: 160px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .step-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+        border-color: #cbd5e1;
+    }
+    
+    .step-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0 0 12px 0;
+    }
+    
+    .step-description {
+        font-size: 14px;
+        color: #475569;
+        margin: 0;
+        line-height: 1.5;
+    }
+    
+    .timeline-marker {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #0ea5e9;
+        position: absolute;
+        top: 74px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+        box-shadow: 0 0 0 4px white;
+    }
+</style>
+
+<div class="bg-gray-100 py-10">
+    <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="pt-12 pb-6 px-16 border-b border-gray-200">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Next Steps</h1>
+            <p class="text-gray-600 max-w-4xl">
+                Based on your AI Maturity Assessment results, we recommend the following action plan to advance your organization's AI capabilities and realize business value.
+            </p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="px-16 py-12">
+            <div class="roadmap">
+                <!-- Step 1 -->
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">🧠</div>
+                    <div class="timeline-marker"></div>
+                    <div class="step-card">
+                        <h3 class="step-title">Deep-Dive Strategy Workshop</h3>
+                        <p class="step-description">Review dimension-level findings with key stakeholders to align on priorities and opportunities.</p>
+                    </div>
+                    
+                    <div class="step-connector">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">🛣️</div>
+                    <div class="timeline-marker"></div>
+                    <div class="step-card">
+                        <h3 class="step-title">AI Roadmap Co-Creation</h3>
+                        <p class="step-description">Build a 6–12 month AI roadmap tied to business priorities and strategic objectives.</p>
+                    </div>
+                    
+                    <div class="step-connector">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">📊</div>
+                    <div class="timeline-marker"></div>
+                    <div class="step-card">
+                        <h3 class="step-title">Use Case Prioritization</h3>
+                        <p class="step-description">Map quick wins and transformational bets based on feasibility, ROI, and strategic alignment.</p>
+                    </div>
+                    
+                    <div class="step-connector">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">🚀</div>
+                    <div class="timeline-marker"></div>
+                    <div class="step-card">
+                        <h3 class="step-title">Capability Building & Execution</h3>
+                        <p class="step-description">Launch focused skill-building programs and AI pilots to demonstrate value and build momentum.</p>
+                    </div>
+                </div>
+            </div>
+
+            
+            <!-- CTA Section -->
+            <div class="text-center mt-10">
+                <a href="https://outlook.office.com/bookwithme/user/0fed29cbb92f497f9df461ac81799754@networkscience.ai/meetingtype/IE_p6px-GEu0ebuyrm0eMw2?anonymous&ismsaljsauthenabled&ep=mLinkFromTile" target="_blank" class="inline-block bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition duration-200 transform hover:-translate-y-1 no-underline">
+                    Schedule Your Strategy Workshop
+                </a>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="flex justify-center space-x-4 mt-8">
+                <a href="{% url 'results' %}{% if request.GET.session %}?session={{ request.GET.session }}{% endif %}" class="bg-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition duration-200">
+                    Back to Results
+                </a>
+                <a href="{% url 'radar_chart' %}{% if request.GET.session %}?session={{ request.GET.session }}{% endif %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200">
+                    View Radar Chart
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{% load dict_extras %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col bg-white">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 py-6">
+        <div class="max-w-5xl mx-auto px-6 sm:px-8">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-semibold text-gray-800">AI Maturity Assessment</h1>
+                <div class="flex items-center">
+                    <span class="text-sm font-medium text-gray-600">Executive Report</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow py-10 px-6 sm:px-8">
+        <div class="max-w-5xl mx-auto">
+            <!-- Completion Message -->
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-3">🎉 Assessment Complete!</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">You've successfully completed all 9 sections of the AI Maturity Assessment.</p>
+            </div>
+            
+            <!-- Results Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                <!-- Radar Chart -->
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Your AI Maturity Profile</h3>
+                    <div style="height: 500px; width: 100%;">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+
+                </div>
+                
+                <!-- Strengths and Gaps -->
+                <div class="bg-white rounded-xl shadow-sm border p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Key Insights</h3>
+                    
+                    <!-- Top Strengths -->
+                    <div class="mb-6">
+                        <h4 class="text-base font-medium text-gray-700 mb-3">Top 3 Strengths</h4>
+                        <div class="space-y-3">
+                            {% for category, score in strengths %}
+                            <div class="bg-green-50 p-3 pl-4 rounded border-l-4 border-green-500">
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-sm" title="{{category|safe}}">{{ category|truncatechars:25|safe }}</span>
+                                    <span class="text-green-600 font-medium text-sm">{{ score|floatformat:1 }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Opportunities -->
+                    <div>
+                        <h4 class="text-base font-medium text-gray-700 mb-3">Top 3 Opportunities</h4>
+                        <div class="space-y-3">
+                            {% for category, score in opportunities %}
+                            <div class="bg-amber-50 p-3 pl-4 rounded border-l-4 border-amber-500">
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-sm" title="{{ category|safe }}">{{ category|truncatechars:25|safe }}</span>
+                                    <span class="text-amber-600 font-medium text-sm">{{ score|floatformat:1 }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Overall Score and Stage -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 mb-12">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Your Overall AI Maturity Score</h3>
+                        <p class="text-gray-600 mb-4 md:mb-0">Based on your responses across all 12 dimensions</p>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="text-5xl font-bold text-blue-600 mr-3">{{ scores.overall_score }}</div>
+                        <div class="text-gray-600">
+                            <div class="font-medium text-lg">{{ scores.maturity_level }}</div>
+                            <div class="text-sm text-gray-500">out of 5</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Scoring Stages Reference -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">Maturity Stages (Score out of 25)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-2 text-xs">
+                        <div class="text-center p-2 rounded {% if scores.maturity_level == 'Nascent' %}bg-blue-100 text-blue-800{% else %}text-gray-600{% endif %}">
+                            <div class="font-medium">Nascent</div>
+                            <div class="text-xs">5-9</div>
+                        </div>
+                        <div class="text-center p-2 rounded {% if scores.maturity_level == 'Emerging' %}bg-blue-100 text-blue-800{% else %}text-gray-600{% endif %}">
+                            <div class="font-medium">Emerging</div>
+                            <div class="text-xs">10-14</div>
+                        </div>
+                        <div class="text-center p-2 rounded {% if scores.maturity_level == 'Scaling' %}bg-blue-100 text-blue-800{% else %}text-gray-600{% endif %}">
+                            <div class="font-medium">Scaling</div>
+                            <div class="text-xs">15-19</div>
+                        </div>
+                        <div class="text-center p-2 rounded {% if scores.maturity_level == 'Transforming' %}bg-blue-100 text-blue-800{% else %}text-gray-600{% endif %}">
+                            <div class="font-medium">Transforming</div>
+                            <div class="text-xs">20-24</div>
+                        </div>
+                        <div class="text-center p-2 rounded {% if scores.maturity_level == 'Leading' %}bg-blue-100 text-blue-800{% else %}text-gray-600{% endif %}">
+                            <div class="font-medium">Leading</div>
+                            <div class="text-xs">25</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stage Description -->
+                {% if scores.stage_description %}
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-blue-900 mb-2">{{ scores.maturity_level }} Stage Guidance</h4>
+                    <p class="text-sm text-blue-800">{{ scores.stage_description }}</p>
+                    {% if scores.stage_score %}
+                    <div class="mt-2 text-xs text-blue-700">
+                        <strong>Stage Score:</strong> {{ scores.stage_score }} out of 25
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            
+
+            
+            <!-- PDF Download Section -->
+           <!--  <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-8 mb-8">
+                <div class="text-center">
+                    <div class="mb-4">
+                        <svg class="w-16 h-16 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Get Your Detailed Report</h3>
+                    <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
+                        Download a comprehensive PDF report with detailed analysis, dimension-wise insights, 
+                        radar chart visualization, and personalized recommendations for your AI maturity journey.
+                    </p>
+                    <a href="{% url 'generate_pdf_report' %}{% if request.GET.session %}?session={{ request.GET.session }}{% endif %}" 
+                       class="inline-flex items-center bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Download My PDF Report
+                    </a>
+                </div>
+            </div> -->
+            
+            <!-- Action Buttons -->
+            <div class="flex justify-center space-x-4">
+                <a href="{% url 'radar_chart' %}{% if request.GET.session %}?session={{ request.GET.session }}{% endif %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200">
+                    View Detailed Radar Chart
+                </a>
+                <a href="{% url 'next_steps' %}{% if request.GET.session %}?session={{ request.GET.session }}{% endif %}" class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition duration-200">
+                    Get Next Steps
+                </a>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+// Create radar chart
+const ctx = document.getElementById('radarChart').getContext('2d');
+
+const categories = {{ categories|safe }};
+const userScores = [
+    {% for category in categories %}
+    {{ scores.category_scores|lookup:category|default:0 }}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
+
+// Scoring mechanism for stages
+const scoringMechanism = {
+    'Nascent': { min: 5, max: 9, avgMin: 1.0, avgMax: 1.9 },
+    'Emerging': { min: 10, max: 12, avgMin: 2.0, avgMax: 2.4 },
+    'Scaling': { min: 13, max: 17, avgMin: 2.5, avgMax: 3.4 },
+    'Transforming': { min: 18, max: 21, avgMin: 3.5, avgMax: 4.2 },
+    'Leading': { min: 22, max: 25, avgMin: 4.3, avgMax: 5.0 }
+};
+
+function getStageFromScore(score) {
+    const totalScore = score * 5; // Convert to total points out of 25
+    for (const [stage, range] of Object.entries(scoringMechanism)) {
+        if (totalScore >= range.min && totalScore <= range.max) {
+            return stage;
+        }
+    }
+    return 'Nascent';
+}
+
+function getStageColor(stage) {
+    const stageColors = {
+        'Nascent': '#D32F2F',
+        'Emerging': '#ef6c00', 
+        'Scaling': '#7b1fa2',
+        'Transforming': '#0277bd',
+        'Leading': '#2e7d32'
+    };
+    return stageColors[stage] || '#eda5b0';
+}
+// Function to wrap text for labels
+function wrapText(text, maxLength = 15) {
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = '';
+    
+    for (const word of words) {
+        if ((currentLine + word).length <= maxLength) {
+            currentLine += (currentLine ? ' ' : '') + word;
+        } else {
+            if (currentLine) lines.push(currentLine);
+            currentLine = word;
+        }
+    }
+    if (currentLine) lines.push(currentLine);
+    return lines;
+}
+
+const radarChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+        labels: categories,
+        datasets: [
+            {
+                label: '{{ request.session.user_company|default:"Your Organization" }}',
+                data: userScores,
+                backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                borderColor: 'rgba(59, 130, 246, 0.8)',
+                pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointHoverBackgroundColor: 'rgba(59, 130, 246, 1)',
+                pointHoverBorderColor: '#fff',
+                borderWidth: 2,
+                tension: 0.1
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+            padding: {
+                top: 40,
+                bottom: 40,
+                left: 40,
+                right: 40
+            }
+        },
+        scales: {
+            r: {
+                angleLines: {
+                    display: true,
+                    color: 'rgba(0, 0, 0, 0.1)',
+                    lineWidth: 1
+                },
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)',
+                    lineWidth: 1
+                },
+                pointLabels: {
+                    font: {
+                        size: 11,
+                        weight: '500'
+                    },
+                    color: '#374151',
+                    padding: 15,
+                    callback: function(label, index) {
+                        return wrapText(label, 15);
+                    }
+                },
+                suggestedMin: 0,
+                suggestedMax: 5,
+                ticks: {
+                    stepSize: 1,
+                    font: {
+                        size: 10
+                    },
+                    color: '#6B7280',
+                    backdropColor: 'rgba(255, 255, 255, 0.8)',
+                    backdropPadding: 2
+                }
+            }
+        },
+        plugins: {
+            legend: { 
+                display: true,
+                position: 'bottom',
+                labels: {
+                    font: {
+                        size: 12,
+                        weight: '500'
+                    },
+                    color: '#374151',
+                    padding: 20,
+                    usePointStyle: true,
+                    pointStyle: 'circle'
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                borderColor: 'rgba(59, 130, 246, 0.8)',
+                borderWidth: 1,
+                cornerRadius: 8,
+                displayColors: true,
+                callbacks: {
+                    title: function(context) {
+                        return context[0].label;
+                    },
+                    label: function(context) {
+                        const score = context.parsed.r;
+                        const stage = getStageFromScore(score);
+                        return [
+                            `Score: ${score.toFixed(1)}/5`,
+                            `Stage: ${stage}`
+                        ];
+                    },
+                    labelColor: function(context) {
+                        const score = userScores[context.dataIndex];
+                        const stage = getStageFromScore(score);
+                        return {
+                            backgroundColor: getStageColor(stage),
+                            borderColor: getStageColor(stage)
+                        };
+                    }
+                }
+            }
+        },
+        elements: {
+            line: { 
+                tension: 0.1,
+                borderWidth: 2
+            },
+            point: {
+                radius: 6,
+                hoverRadius: 8,
+                borderWidth: 2
+            }
+        },
+        interaction: {
+            intersect: false,
+            mode: 'point'
+        }
+    }
+});
+</script>
+{% endblock %}
